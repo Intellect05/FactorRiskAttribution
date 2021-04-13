@@ -102,7 +102,6 @@ if(is.na(scale)) {
     )
   }
   
-
 if(drop_factor>0){
     Factors[,drop_factor]<-0
 }
@@ -273,12 +272,8 @@ if(method == "x sigma rho attribution"){
     Factor5<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
   
-  
-  
-  
   for( i in 1:length(Factors)){
-    
-    
+     
     F_Matrices[i,]<-(F_Cov[i,6])
     
     if(F_Matrices[i,c(1,2,3,4,5,7:ncol(F_Matrices))]>0|F_Matrices[i,c(1,2,3,4,5,7:ncol(F_Matrices))]<0){
@@ -286,8 +281,6 @@ if(method == "x sigma rho attribution"){
     }
     Factor6<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
-  
-  
   
   for( i in 1:length(Factors)){
     
@@ -299,8 +292,6 @@ if(method == "x sigma rho attribution"){
     Factor7<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
   
-  
-  
   for( i in 1:length(Factors)){
     
     F_Matrices[i,]<-(F_Cov[i,8])
@@ -310,8 +301,6 @@ if(method == "x sigma rho attribution"){
     }
     Factor8<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
-  
-  
   
   for( i in 1:length(Factors)){
     
@@ -361,7 +350,6 @@ for( i in 1:length(Factors)){
     Factor13<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
   
-  
   Total_Factor =(as.matrix(Factor1)+as.matrix(Factor2)+as.matrix(Factor3)+as.matrix(Factor4)+as.matrix(Factor5)+as.matrix(Factor6)+as.matrix(Factor7)+as.matrix(Factor8)+as.matrix(Factor9)+as.matrix(Factor10)+as.matrix(Factor11)+as.matrix(Factor12)
                  +as.matrix(Factor13))
   
@@ -376,7 +364,6 @@ for( i in 1:length(Factors)){
   F4_risk=((t(as.matrix(ActiveWeights))%*%as.matrix(Factor4)%*%as.matrix(ActiveWeights))/Total_risk1)*sqrt(scale)
   
   F5_risk=((t(as.matrix(ActiveWeights))%*%as.matrix(Factor5)%*%as.matrix(ActiveWeights))/Total_risk1)*sqrt(scale)
-  
   
   F6_risk=((t(as.matrix(ActiveWeights))%*%as.matrix(Factor6)%*%as.matrix(ActiveWeights))/Total_risk1)*sqrt(scale)
   
@@ -471,7 +458,7 @@ for( i in 1:length(Factors)){
   Factor13_MCTR<-((as.matrix(Factor13)%*%as.matrix(ActiveWeights))%*%(1/sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(Total_Factor)%*%as.matrix(ActiveWeights)))))*sqrt(scale)
   
   Factor13_CCTR<-ActiveWeights*Factor13_MCTR
-  
+                     
   Factor_MCTR_CCTR=data.frame(ActiveWeights, Factor1_CCTR,Factor2_CCTR,Factor3_CCTR,Factor4_CCTR,Factor5_CCTR,Factor6_CCTR,Factor7_CCTR,Factor8_CCTR,Factor9_CCTR,
                               Factor10_CCTR,Factor11_CCTR,Factor12_CCTR,Factor13_CCTR)
   colnames(Factor_MCTR_CCTR)<-c("Acitve Weights",colnames(Factors))
