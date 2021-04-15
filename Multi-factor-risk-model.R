@@ -7,7 +7,7 @@ MultiFactor_Attr<-function(Stocks, Factors, PortfolioWeights=rep(1,ncol(Stocks))
                            method=c("x sigma rho attribution","Alpha Beta attribution","MCTR","Factor risk attribution","Factor MCTR", "Exposure Analysis","VaR"), 
                            scale=NA,drop_factor=NA,tail.prob,h){
   if(is.na(drop_factor)){
-  n<-as.numeric(drop_factor)}
+  drop_factor<-as.numeric(drop_factor)}
   
   Stocks<-as.data.frame(Stocks)
   
