@@ -4,7 +4,8 @@ library(readxl)
 
 MultiFactor_Attr<-function(Stocks, Factors, PortfolioWeights=rep(1,ncol(Stocks)),IndexWeights=rep(1,ncol(Stocks)),
                            ActiveWeights=rep(1,ncol(Stocks)),
-                           method=c("x sigma rho attribution","Alpha Beta attribution","MCTR","Factor risk attribution","Factor MCTR", "Exposure Analysis"), scale=NA,drop_factor=NA){
+                           method=c("x sigma rho attribution","Alpha Beta attribution","MCTR","Factor risk attribution","Factor MCTR", "Exposure Analysis","VaR"), 
+                           scale=NA,drop_factor=NA,tail.prob,h){
   if(is.na(drop_factor)){
   n<-as.numeric(drop_factor)}
   
@@ -144,29 +145,42 @@ if(method == "x sigma rho attribution"){
     return(results=xSigmaRho)
     }
   
- if(method == "Alpha Beta attribution"){
-      
-      ##Calculate 
-      Beta_returns<-as.matrix(Factors)%*%as.matrix(output[2:nrow(output),1:ncol(output)])
-      
-      Alpha_returns = Stocks[]-Beta_returns
-      
-      Specific_risk = (sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Alpha_returns, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
-      
-      
-      Systematic_risk=(sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Beta_returns, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
-      
-      Total_risk=sqrt(sum(Systematic_risk^2+Specific_risk^2))
-      
-      Alpha_Beta_attr<-data.frame(Specific_risk,Systematic_risk,Total_risk)
-      
-      colnames(Alpha_Beta_attr)<-c("Specific Risk", "Systematic Risk", "Total Risk")
-      
-      rownames(Alpha_Beta_attr)<-c("Portfolio")
-      
-      return(results=Alpha_Beta_attr)
-      
-  }
+   ##Calculate 
+    Beta_returns<-as.matrix(Factors)%*%as.matrix(output[2:nrow(output),1:ncol(output)])
+    
+    Alpha_returns = Stocks[]-Beta_returns
+    
+    Specific_risk = (sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Alpha_returns, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
+    
+    
+    Systematic_risk=(sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Beta_returns, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
+    
+    Total_risk=sqrt(sum(Systematic_risk^2+Specific_risk^2))
+  
+    if ( tail.prob < 0 || tail.prob > 1){
+      stop("tail.prob must be between 0 and 1")}
+    
+    Systematic_VaR =(-Systematic_risk* qnorm(tail.prob)*sqrt(as.integer(h)/scale))
+    Specific_VaR =(-Specific_risk* qnorm(tail.prob)*sqrt(as.integer(h)/scale))
+    Total_VaR = (-Total_risk*qnorm(tail.prob)*sqrt(as.integer(h)/scale))
+    
+    Alpha_Beta_attr<-data.frame(Specific_risk,Systematic_risk,Total_risk,Systematic_VaR,Specific_VaR,Total_VaR)
+    
+    colnames(Alpha_Beta_attr)<-c("Specific Risk", "Systematic Risk", "Total Risk","Systematic VaR", "Specific VaR", "Total VaR")
+    
+    rownames(Alpha_Beta_attr)<-c("Portfolio")
+    
+    VaR<- data.frame(Systematic_VaR,Specific_VaR,Total_VaR)
+    colnames(VaR)<-c("Systematic VaR","Specific VaR", "Total VaR")
+    rownames(VaR)<-c("Portfolio")
+    
+    if( method == "Alpha Beta attribution"){
+    
+    return(results=Alpha_Beta_attr)}
+    
+    if( method == "VaR"){
+      return(results = VaR)
+    }
   
  if( method =="MCTR"){
     
