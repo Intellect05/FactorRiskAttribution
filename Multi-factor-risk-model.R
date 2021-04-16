@@ -5,9 +5,12 @@ library(readxl)
 MultiFactor_Attr<-function(Stocks, Factors, PortfolioWeights=rep(1,ncol(Stocks)),IndexWeights=rep(1,ncol(Stocks)),
                            ActiveWeights=rep(1,ncol(Stocks)),
                            method=c("x sigma rho attribution","Alpha Beta attribution","MCTR","Factor risk attribution","Factor MCTR", "Exposure Analysis","VaR"), 
-                           scale=NA,drop_factor=NA,tail.prob,h){
+                           scale=NA,drop_factor=NA,tail.prob,h=NA){
   if(is.na(drop_factor)){
   drop_factor<-as.numeric(drop_factor)}
+  
+  if(is.na(h)){
+    h<-as.integer(h)}
   
   Stocks<-as.data.frame(Stocks)
   
@@ -164,9 +167,9 @@ if(method == "x sigma rho attribution"){
     Specific_VaR =(-Specific_risk* qnorm(tail.prob)*sqrt(as.integer(h)/scale))
     Total_VaR = (-Total_risk*qnorm(tail.prob)*sqrt(as.integer(h)/scale))
     
-    Alpha_Beta_attr<-data.frame(Specific_risk,Systematic_risk,Total_risk,Systematic_VaR,Specific_VaR,Total_VaR)
+    Alpha_Beta_attr<-data.frame(Specific_risk,Systematic_risk,Total_risk)
     
-    colnames(Alpha_Beta_attr)<-c("Specific Risk", "Systematic Risk", "Total Risk","Systematic VaR", "Specific VaR", "Total VaR")
+    colnames(Alpha_Beta_attr)<-c("Specific Risk", "Systematic Risk", "Total Risk")
     
     rownames(Alpha_Beta_attr)<-c("Portfolio")
     
