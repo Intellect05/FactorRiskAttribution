@@ -203,7 +203,7 @@ MultiFactor_Attr<-function(Stocks, Factors, PortfolioWeights=rep(1,ncol(Stocks))
     
     colnames(MCTR)<-c("Active Weights","Systematic MCTR","Specific MCTR","Systematic CCTR","Specific CCTR")
     
-    return(results=write.xlsx(MCTR,"U:\\Risk_Model\\MCTR.xlsx"))
+    return(results=MCTR)
   }
   
   if(method == "Exposure Analysis"){
@@ -480,7 +480,7 @@ MultiFactor_Attr<-function(Stocks, Factors, PortfolioWeights=rep(1,ncol(Stocks))
   
   
   if(method == "Factor MCTR"){
-    return(results=write.xlsx(Factor_MCTR_CCTR,"U:\\Risk_Model\\output.xlsx"))
+    return(results=Factor_MCTR_CCTR)
   }
   return(results)
 }
