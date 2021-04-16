@@ -7,7 +7,7 @@ MultiFactor_Attr<-function(Stocks, Factors, PortfolioWeights=rep(1,ncol(Stocks))
                            method=c("x sigma rho attribution","Alpha Beta attribution","MCTR","Factor risk attribution","Factor MCTR", "Exposure Analysis","VaR"), 
                            scale=NA,drop_factor=NA,tail.prob,h=NA){
   if(is.na(drop_factor)){
-  drop_factor<-as.numeric(drop_factor)}
+    drop_factor<-as.numeric(drop_factor)}
   
   if(is.na(h)){
     h<-as.integer(h)}
@@ -22,7 +22,7 @@ MultiFactor_Attr<-function(Stocks, Factors, PortfolioWeights=rep(1,ncol(Stocks))
     }
   }
   
-Factors<-as.data.frame(Factors)
+  Factors<-as.data.frame(Factors)
   
   list(Factors, all.names = TRUE)
   
@@ -37,7 +37,7 @@ Factors<-as.data.frame(Factors)
   if(nrow(Stocks)!=nrow(Factors)){
     message("The timeseries length of asset returns should be equal to that factor returns")
   }
-
+  
   # check Active weights options
   if (!is.null(ActiveWeights)) {
     if (is.vector(ActiveWeights)){
@@ -88,12 +88,12 @@ Factors<-as.data.frame(Factors)
       #@todo: check for date overlap with R and weights
     }
   } # end IndexWeights checks
-   
+  
   #Specify the scale of the returns, i.e., daily, weekly, monthly, quarterly
-if(is.na(scale) && !xtsible(x))
+  if(is.na(scale) && !xtsible(x))
     stop("'x' needs to be timeBased or xtsible, or scale must be specified." )
   
-if(is.na(scale)) {
+  if(is.na(scale)) {
     freq = periodicity(x)
     switch(freq$scale,
            minute = {stop("Data periodicity too high")},
@@ -106,24 +106,24 @@ if(is.na(scale)) {
     )
   }
   
-if(drop_factor>0){
+  if(drop_factor>0){
     Factors[,drop_factor]<-0
-}
+  }
   
   ##Calc Factor Covariance Matrix
   
   F_Cov<-cov(Factors, use= "everything")
   
- if(var(Factors[,1]) != F_Cov[1,1]){
+  if(var(Factors[,1]) != F_Cov[1,1]){
     message("the variances in the factor returns does not match the variances in the Factor Covariance Matrix ")
   }
   
   output=matrix(nrow=ncol(Factors)+1, ncol=ncol(Stocks))
   for(i in 1: length(Stocks)){
     
- for( j in 1:i){   
+    for( j in 1:i){   
       R <- lm(Stocks[,i]~., data = as.data.frame(Factors))   
-   }
+    }
     
     output[,i:ncol(Stocks)]<-rep(R$coefficients[1:(ncol(Factors)+1)])
     
@@ -138,106 +138,102 @@ if(drop_factor>0){
     }
   }
   
-if(method == "x sigma rho attribution"){
-      x_sigma_rho= (sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Stocks, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
-      
-      xSigmaRho = data.frame(x_sigma_rho)
-      colnames(xSigmaRho)<-c("Ex ante Tracking Error")
-      rownames(xSigmaRho)<-c("Portfolio")
-      
+  if(method == "x sigma rho attribution"){
+    x_sigma_rho= (sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Stocks, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
+    
+    xSigmaRho = data.frame(x_sigma_rho)
+    colnames(xSigmaRho)<-c("Ex ante Tracking Error")
+    rownames(xSigmaRho)<-c("Portfolio")
+    
     return(results=xSigmaRho)
-    }
+  }
   
-   ##Calculate 
-    Beta_returns<-as.matrix(Factors)%*%as.matrix(output[2:nrow(output),1:ncol(output)])
-    
-    Alpha_returns = Stocks[]-Beta_returns
-    
-    Specific_risk = (sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Alpha_returns, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
-    
-    
-    Systematic_risk=(sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Beta_returns, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
-    
-    Total_risk=sqrt(sum(Systematic_risk^2+Specific_risk^2))
+  ##Calculate 
+  Beta_returns<-as.matrix(Factors)%*%as.matrix(output[2:nrow(output),1:ncol(output)])
   
-    if ( tail.prob < 0 || tail.prob > 1){
-      stop("tail.prob must be between 0 and 1")}
-    
-    Systematic_VaR =(-Systematic_risk* qnorm(tail.prob)*sqrt(as.integer(h)/scale))
-    Specific_VaR =(-Specific_risk* qnorm(tail.prob)*sqrt(as.integer(h)/scale))
-    Total_VaR = (-Total_risk*qnorm(tail.prob)*sqrt(as.integer(h)/scale))
-    
-    Alpha_Beta_attr<-data.frame(Specific_risk,Systematic_risk,Total_risk)
-    
-    colnames(Alpha_Beta_attr)<-c("Specific Risk", "Systematic Risk", "Total Risk")
-    
-    rownames(Alpha_Beta_attr)<-c("Portfolio")
-    
-    VaR<- data.frame(Systematic_VaR,Specific_VaR,Total_VaR)
-    colnames(VaR)<-c("Systematic VaR","Specific VaR", "Total VaR")
-    rownames(VaR)<-c("Portfolio")
-    
-    if( method == "Alpha Beta attribution"){
+  Alpha_returns = Stocks[]-Beta_returns
+  
+  Specific_risk = (sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Alpha_returns, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
+  
+  
+  Systematic_risk=(sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Beta_returns, use = "everything"))%*%as.matrix(ActiveWeights)))*sqrt(scale))*100
+  
+  Total_risk=sqrt(sum(Systematic_risk^2+Specific_risk^2))
+  
+  if ( tail.prob < 0 || tail.prob > 1){
+    stop("tail.prob must be between 0 and 1")}
+  
+  Systematic_VaR =(-Systematic_risk* qnorm(tail.prob)*sqrt(as.integer(h)/scale))
+  Specific_VaR =(-Specific_risk* qnorm(tail.prob)*sqrt(as.integer(h)/scale))
+  Total_VaR = (-Total_risk*qnorm(tail.prob)*sqrt(as.integer(h)/scale))
+  
+  Alpha_Beta_attr<-data.frame(Specific_risk,Systematic_risk,Total_risk)
+  
+  colnames(Alpha_Beta_attr)<-c("Specific Risk", "Systematic Risk", "Total Risk")
+  
+  rownames(Alpha_Beta_attr)<-c("Portfolio")
+  
+  VaR<- data.frame(Systematic_VaR,Specific_VaR,Total_VaR)
+  colnames(VaR)<-c("Systematic VaR","Specific VaR", "Total VaR")
+  rownames(VaR)<-c("Portfolio")
+  
+  if( method == "Alpha Beta attribution"){
     
     return(results=Alpha_Beta_attr)}
-    
-    if( method == "VaR"){
-      return(results = VaR)
-    }
   
- if( method =="MCTR"){
+  if( method == "VaR"){
+    return(results = VaR)
+  }
+  
+  if( method =="MCTR"){
     
     Beta_returns<-as.matrix(Factors)%*%as.matrix(output[2:nrow(output),1:ncol(output)])
     
     Alpha_returns = Stocks[]-Beta_returns
     
-    Beta_MCR<-(as.matrix(cov(Beta_returns, use = "everything"))%*%as.matrix(ActiveWeights))%*%(1/sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Beta_returns, use = "everything"))%*%as.matrix(ActiveWeights))))
+    Systematic_MCTR<-((as.matrix(cov(Beta_returns, use = "everything"))%*%as.matrix(ActiveWeights))%*%(1/sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Beta_returns, use = "everything"))%*%as.matrix(ActiveWeights)))))*sqrt(scale)
     
-    Systematic_MCTR=Beta_MCR*sqrt(scale)
+    Systematic_CCTR<-ActiveWeights*Systematic_MCTR
     
-    Systematic_CCTR<-ActiveWeights*Beta_MCR
+    Specific_MCTR<-((as.matrix(cov(Alpha_returns, use = "everything"))%*%as.matrix(ActiveWeights))%*%(1/sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Alpha_returns, use = "everything"))%*%as.matrix(ActiveWeights)))))*sqrt(scale)
     
-    Alpha_MCTR<-(as.matrix(cov(Alpha_returns, use = "everything"))%*%as.matrix(ActiveWeights))%*%(1/sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(cov(Alpha_returns, use = "everything"))%*%as.matrix(ActiveWeights))))
-    
-    Specific_MCTR=Alpha_MCTR*sqrt(scale)
-    
-    Specific_CCTR<-ActiveWeights*Alpha_MCTR
+    Specific_CCTR<-ActiveWeights*Specific_MCTR
     
     MCTR=data.frame(ActiveWeights, Systematic_MCTR,Specific_MCTR,Systematic_CCTR,Specific_CCTR)
     
     colnames(MCTR)<-c("Active Weights","Systematic MCTR","Specific MCTR","Systematic CCTR","Specific CCTR")
     
-    return(results=MCTR)
+    return(results=write.xlsx(MCTR,"U:\\Risk_Model\\MCTR.xlsx"))
   }
   
   if(method == "Exposure Analysis"){
-  Port_exposure = matrix(nrow=nrow(output), ncol = 1)
-  BM_exposure = matrix(nrow=nrow(output), ncol = 1)
-  
- for(i in 1:nrow(output)){
+    Port_exposure = matrix(nrow=nrow(output), ncol = 1)
+    BM_exposure = matrix(nrow=nrow(output), ncol = 1)
     
-    Port_exposure[i,]<-t(as.matrix(output[i,1:ncol(output)]))%*%as.matrix(PortfolioWeights)
-    BM_exposure[i,]<-t(as.matrix(output[i,1:ncol(output)]))%*%as.matrix(IndexWeights)
-    Active_exposure=(Port_exposure-BM_exposure)
-    Fund_Exposure<-data.frame(sum(Port_exposure[2:nrow(Port_exposure),]),sum(BM_exposure[2:nrow(BM_exposure),]),
-                              sum(Active_exposure[2:nrow(Port_exposure),]))
-    Factor_Exposure<-data.frame(Port_exposure,BM_exposure,Active_exposure)
-    
-    colnames(Factor_Exposure)<-c("Portfolio", "BM", "Active")
-    rownames(Factor_Exposure)<-rownames(output)
-    
-    colnames(Fund_Exposure)<-c("Portfolio", "BM", "Active")
-    rownames(Fund_Exposure)<-c("Fund level")
-    
-    Exposure<-rbind.data.frame(Fund_Exposure,Factor_Exposure)
-    
-  }
+    for(i in 1:nrow(output)){
+      
+      Port_exposure[i,]<-t(as.matrix(output[i,1:ncol(output)]))%*%as.matrix(PortfolioWeights)
+      BM_exposure[i,]<-t(as.matrix(output[i,1:ncol(output)]))%*%as.matrix(IndexWeights)
+      Active_exposure=(Port_exposure-BM_exposure)
+      Fund_Exposure<-data.frame(sum(Port_exposure[2:nrow(Port_exposure),]),sum(BM_exposure[2:nrow(BM_exposure),]),
+                                sum(Active_exposure[2:nrow(Port_exposure),]))
+      Factor_Exposure<-data.frame(Port_exposure,BM_exposure,Active_exposure)
+      
+      colnames(Factor_Exposure)<-c("Portfolio", "BM", "Active")
+      rownames(Factor_Exposure)<-rownames(output)
+      
+      colnames(Fund_Exposure)<-c("Portfolio", "BM", "Active")
+      rownames(Fund_Exposure)<-c("Fund level")
+      
+      Exposure<-rbind.data.frame(Fund_Exposure,Factor_Exposure)
+      
+    }
     return(results = Exposure)
-}
-   
+  }
+  
   F_Matrices=matrix(nrow=ncol(Factors), ncol=ncol(Factors))
   
- for( i in 1:length(Factors)){
+  for( i in 1:length(Factors)){
     
     F_Matrices[i,]<-(F_Cov[i,1])
     
@@ -247,7 +243,7 @@ if(method == "x sigma rho attribution"){
     Factor1<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
   
- for( i in 1:length(Factors)){
+  for( i in 1:length(Factors)){
     for ( j in 1:i){
       
       F_Matrices[i,]<-(F_Cov[i,2])
@@ -259,7 +255,7 @@ if(method == "x sigma rho attribution"){
     }
   }
   
- for( i in 1:length(Factors)){
+  for( i in 1:length(Factors)){
     
     F_Matrices[i,]<-(F_Cov[i,3])
     
@@ -268,7 +264,7 @@ if(method == "x sigma rho attribution"){
     }
     Factor3<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
- 
+  
   for( i in 1:length(Factors)){
     
     F_Matrices[i,]<-(F_Cov[i,4])
@@ -279,7 +275,7 @@ if(method == "x sigma rho attribution"){
     Factor4<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
   
- for( i in 1:length(Factors)){
+  for( i in 1:length(Factors)){
     
     F_Matrices[i,]<-(F_Cov[i,5])
     
@@ -290,7 +286,7 @@ if(method == "x sigma rho attribution"){
   }
   
   for( i in 1:length(Factors)){
-     
+    
     F_Matrices[i,]<-(F_Cov[i,6])
     
     if(F_Matrices[i,c(1,2,3,4,5,7:ncol(F_Matrices))]>0|F_Matrices[i,c(1,2,3,4,5,7:ncol(F_Matrices))]<0){
@@ -329,7 +325,7 @@ if(method == "x sigma rho attribution"){
     Factor9<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
   
- for( i in 1:length(Factors)){
+  for( i in 1:length(Factors)){
     
     F_Matrices[i,]<-(F_Cov[i,10])
     
@@ -339,7 +335,7 @@ if(method == "x sigma rho attribution"){
     Factor10<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
   }
   
-for( i in 1:length(Factors)){
+  for( i in 1:length(Factors)){
     
     F_Matrices[i,]<-(F_Cov[i,11])
     
@@ -347,18 +343,18 @@ for( i in 1:length(Factors)){
       F_Matrices[i,c(1,2,3,4,5,6,7,8,9,10,12,13)]<-0
     }
     Factor11<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
-}
+  }
   
-for( i in 1:length(Factors)){
+  for( i in 1:length(Factors)){
     F_Matrices[i,]<-(F_Cov[i,12])
     
     if(F_Matrices[i,c(1,2,3,4,5,6,7,8,9,10,11,13:ncol(F_Matrices))]>0|F_Matrices[i,c(1,2,3,4,5,6,7,8,9,11,13:ncol(F_Matrices))]<0){
       F_Matrices[i,c(1,2,3,4,5,6,7,8,9,10,11,13:ncol(F_Matrices))]<-0
     }
     Factor12<-t(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))%*%as.matrix(F_Matrices)%*%(as.matrix(output[2:nrow(output),1:ncol(Stocks)]))
-}
+  }
   
- for( i in 1:length(Factors)){
+  for( i in 1:length(Factors)){
     F_Matrices[i,]<-(F_Cov[i,13])
     
     if(F_Matrices[i,c(1,2,3,4,5,6,7,8,9,10,11,12)]>0|F_Matrices[i,c(1,2,3,4,5,6,7,8,9,11,12)]<0){
@@ -407,7 +403,7 @@ for( i in 1:length(Factors)){
   if( method == "Factor risk attribution"){
     return(results = Total_r)
   }
- 
+  
   ##Factor Attribution
   
   ##Factor1
@@ -475,14 +471,16 @@ for( i in 1:length(Factors)){
   Factor13_MCTR<-((as.matrix(Factor13)%*%as.matrix(ActiveWeights))%*%(1/sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(Total_Factor)%*%as.matrix(ActiveWeights)))))*sqrt(scale)
   
   Factor13_CCTR<-ActiveWeights*Factor13_MCTR
-                     
+  
   Factor_MCTR_CCTR=data.frame(ActiveWeights, Factor1_CCTR,Factor2_CCTR,Factor3_CCTR,Factor4_CCTR,Factor5_CCTR,Factor6_CCTR,Factor7_CCTR,Factor8_CCTR,Factor9_CCTR,
                               Factor10_CCTR,Factor11_CCTR,Factor12_CCTR,Factor13_CCTR)
   colnames(Factor_MCTR_CCTR)<-c("Acitve Weights",colnames(Factors))
   rownames(Factor_MCTR_CCTR)<-colnames(Stocks)
   
+  
+  
   if(method == "Factor MCTR"){
-  return(results=Factor_MCTR_CCTR)
+    return(results=write.xlsx(Factor_MCTR_CCTR,"U:\\Risk_Model\\output.xlsx"))
   }
   return(results)
 }
