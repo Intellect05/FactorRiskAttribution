@@ -33,4 +33,5 @@ MultiFactor_Attr(Stocks = Stocks, Factors = Factors,Port_returns = Returns[,9],B
                  Portfolio_name= as.character(Risk_Data[,"Portfolio"][1]), method =c(as.character(Risk_Data[,"Method"][1])), scale = as.numeric(Risk_Data[,"Data_frequency"][1]),
                  drop_factor_1  =(Risk_Data[,"drop_factor_1"][1]),drop_factor_2 = (Risk_Data[,"drop_factor_2"][1]),drop_factor_3 =(Risk_Data[,"drop_factor_3"][1]),
                  tail.prob = as.vector(Risk_Data[,"tail_probability"][1]), h=as.integer(Risk_Data[,"Number_of_Days"][1]), 
-                 Date = excel_numeric_to_date(as.numeric(as.character(Risk_Data[,"Date"][1])), date_system = "modern"))
+                 Date = excel_numeric_to_date(as.numeric(as.character(Risk_Data[,"Date"][1])), date_system = "modern"),output_Path = Risk_Data[,"output"][1])
+
