@@ -14,7 +14,7 @@ MultiFactor_Attr<-function(Stocks, Factors,Port_returns, BM_returns, PortfolioWe
                            ActiveWeights=rep(1,ncol(Stocks)),Portfolio_name ,
                            method=c("x sigma rho attribution","Alpha Beta attribution","MCTR","Factor risk attribution",
                                     "Factor MCTR", "Exposure Analysis","VaR","Risk Ratios","Performance ratios"), 
-                           scale=NA,drop_factor_1=NA,drop_factor_2=NA,drop_factor_3=NA,tail.prob,h=NA,Date){
+                           scale=NA,drop_factor_1=NA,drop_factor_2=NA,drop_factor_3=NA,tail.prob,h=NA,Date, output_Path){
   
   if(is.na(drop_factor_1)){
     drop_factor_1<-as.numeric(drop_factor_1)}
@@ -176,8 +176,7 @@ MultiFactor_Attr<-function(Stocks, Factors,Port_returns, BM_returns, PortfolioWe
     colnames(xSigmaRho)<-c("Date","Ex ante Tracking Error")
     rownames(xSigmaRho)<-c(Portfolio_name)
     
-
-    return(results=write.xlsx(xSigmaRho,"U:\\Risk_Model\\x sigma rho attribution.xlsx"))
+    return(results = write.xlsx(xSigmaRho,paste0("",as.character(output_Path),"x sigma rho attribution.xlsx")))
   }
   
   ##Calculate 
@@ -211,10 +210,13 @@ MultiFactor_Attr<-function(Stocks, Factors,Port_returns, BM_returns, PortfolioWe
   
   if( method == "Alpha Beta attribution"){
     
-    return(results=write.xlsx(Alpha_Beta_attr,"U:\\Risk_Model\\Alpha beta attribution.xlsx"))}
+    return(results = write.xlsx(Alpha_Beta_attr,paste0("",as.character(output_Path),"Alpha beta attribution.xlsx")))
+    
+  }
   
   if( method == "VaR"){
-    return(results =write.xlsx(VaR,"U:\\Risk_Model\\VaR.xlsx"))
+    
+    return(results = write.xlsx(VaR,paste0("",as.character(output_Path),"VaR.xlsx")))
   }
   
   if( method =="MCTR"){
@@ -235,7 +237,8 @@ MultiFactor_Attr<-function(Stocks, Factors,Port_returns, BM_returns, PortfolioWe
     
     colnames(MCTR)<-c("Date","Active Weights","Systematic MCTR","Specific MCTR","Systematic CCTR","Specific CCTR")
     
-    return(results=write.xlsx(MCTR,"U:\\Risk_Model\\MCTR.xlsx"))
+    
+    return(results = write.xlsx(MCTR,paste0("",as.character(output_Path),"MCTR.xlsx.xlsx")))
   }
   
   if(method == "Exposure Analysis"){
@@ -260,7 +263,8 @@ MultiFactor_Attr<-function(Stocks, Factors,Port_returns, BM_returns, PortfolioWe
       Exposure<-rbind.data.frame(Fund_Exposure,Factor_Exposure)
       
     }
-    return(results = write.xlsx(Exposure,"U:\\Risk_Model\\Exposure Analysis.xlsx"))
+    
+    return(results = write.xlsx(Exposure,paste0("",as.character(output_Path),"Exposure Analysis.xlsx")))
   }
   
   F_Matrices=matrix(nrow=ncol(Factors), ncol=ncol(Factors))
@@ -433,11 +437,12 @@ MultiFactor_Attr<-function(Stocks, Factors,Port_returns, BM_returns, PortfolioWe
   row.names(Total_r)<-c("Factor risk attribution")
   
   if( method == "Factor risk attribution"){
-    return(results =  write.xlsx(Total_r,"U:\\Risk_Model\\Factor risk attribution.xlsx"))
+    
+    return(results = write.xlsx(Total_r,paste0("",as.character(output_Path),"Factor risk attribution.xlsx")))
   }
   
-  ##Factor Attribution
-  
+  ##Factor Att  
+
   ##Factor1
   Factor1_MCTR<-((as.matrix(Factor1)%*%as.matrix(ActiveWeights))%*%(1/sqrt((t(as.matrix(ActiveWeights))%*%as.matrix(Total_Factor)%*%as.matrix(ActiveWeights)))))*sqrt(scale)
   
@@ -510,7 +515,9 @@ MultiFactor_Attr<-function(Stocks, Factors,Port_returns, BM_returns, PortfolioWe
   rownames(Factor_MCTR_CCTR)<-colnames(Stocks)
   
   if(method == "Factor MCTR"){
-    return(results=write.xlsx(Factor_MCTR_CCTR,"U:\\Risk_Model\\Factor MCTR.xlsx"))
+    
+    return(results = write.xlsx(Factor_MCTR_CCTR,paste0("",as.character(output_Path),"Factor MCTR.xlsx")))
+    
   }
   
   Portfolio_return<-(as.matrix(Stocks)%*%as.matrix(PortfolioWeights))
@@ -565,7 +572,7 @@ MultiFactor_Attr<-function(Stocks, Factors,Port_returns, BM_returns, PortfolioWe
   
   if(method == "Performance ratios"){
     
-    return(results = write.xlsx(table.PR,"U:\\Risk_Model\\Performance_ratios.xlsx"))
+    return(results = write.xlsx(table.PR,paste0("",as.character(output_Path),"Performance_ratios.xlsx")))
   }
   
   table.RR<-data.frame(Date,Portfolio_volatility,BM_volatility,TE,IR,SR,SortinoR, TreynorR, Upside_risk,Downside_risk,
@@ -578,7 +585,7 @@ MultiFactor_Attr<-function(Stocks, Factors,Port_returns, BM_returns, PortfolioWe
   
   if(method == "Risk Ratios"){
     
-    return(results = write.xlsx(table.RR,"U:\\Risk_Model\\Risk Ratios.xlsx"))
+    return(results = write.xlsx(table.RR,paste0("",as.character(output_Path),"Risk Ratios.xlsx")))
   }
   
   return(results)
