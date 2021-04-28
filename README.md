@@ -11,6 +11,6 @@ The model also outputs the systematic risk, specific risk and total risk of the 
 
 The Model also does exposure analysis where it compares the portfolio and index exposure to the different factors, to understand if the portfolio is taking more risk or not.
 
-The model is uses three types of regression model, the Multi-linear regression model (MLR), the Principal Component regression (PCR) and the Partial Least Squares regression (PLSR). 
+The model is uses three types of regression models, the Multi-linear regression model (MLR), the Principal Component regression (PCR) and the Partial Least Squares regression (PLSR). 
 
 
